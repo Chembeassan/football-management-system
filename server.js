@@ -28,9 +28,14 @@ app.get('/', (req, res) => {
   res.send('Football Management API is running!');
 });
 
-// Your existing routes
+// Routes
+// Matches routes
 const matchesRouter = require('./routes/matches');
 app.use('/api/matches', matchesRouter);
+
+// Teammate's tournament routes
+const tournamentsRouter = require('./routes/tournaments');
+app.use('/api/tournaments', tournamentsRouter);
 
 // Start server
 app.listen(port, () => {

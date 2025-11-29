@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger-output.json');
 require('dotenv').config();
 
 const app = express();
@@ -18,18 +20,22 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('MongoDB connection error:', err));
 
+// Swagger Documentation Route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Basic route
 app.get('/', (req, res) => {
   res.send('Football Management API is running!');
 });
 
-// Routes - ADD YOUR MATCHES ROUTE HERE
+// Your existing routes
 const matchesRouter = require('./routes/matches');
 app.use('/api/matches', matchesRouter);
 
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+  console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
 });
 
 // Error handling middleware

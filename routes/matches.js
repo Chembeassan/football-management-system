@@ -63,7 +63,7 @@ router.get('/:id', matchesController.getMatchById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/MatchInput'
+ *             $ref: '#/components/schemas/Match'
  *     responses:
  *       201:
  *         description: Match created successfully
@@ -90,7 +90,13 @@ router.post('/', matchesController.createMatch);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/MatchInput'
+ *             type: object
+ *             properties:
+ *               score:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *                 enum: [scheduled, live, completed, cancelled]
  *     responses:
  *       200:
  *         description: Match updated successfully
@@ -111,7 +117,6 @@ router.put('/:id', matchesController.updateMatch);
  *         required: true
  *         schema:
  *           type: string
- *         description: Match ID
  *     responses:
  *       200:
  *         description: Match deleted successfully

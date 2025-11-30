@@ -1,55 +1,211 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
+const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger-output.json');
-require('dotenv').config();
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/football-management');
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
+};
 
-// Swagger Documentation Route
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Swagger configuration
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Football Management API',
+      description: 'API for managing football teams, players, matches, and tournaments',
+      version: '1.0.0',
+      contact: {
+        name: 'API Support',
+        email: 'support@footballapi.com'
+      }
+    },
+    servers: [
+      {
+        url: process.env.RENDER_URL || 'http://localhost:3000',
+        description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server'
+      }
+    ],
+    tags: [
+      {
+        name: 'Matches',
+        description: 'Football matches management'
+      },
+      {
+        name: 'Tournaments',
+        description: 'Football tournaments management'
+      }
+    ],
+    components: {
+      schemas: {
+        Match: {
+          type: 'object',
+          required: ['teamA', 'teamB', 'date', 'venue'],
+          properties: {
+            _id: {
+              type: 'string',
+              description: 'Auto-generated MongoDB ID'
+            },
+            teamA: {
+              type: 'string',
+              description: 'First team ID'
+            },
+            teamB: {
+              type: 'string',
+              description: 'Second team ID'
+            },
+            tournament: {
+              type: 'string',
+              description: 'Tournament ID'
+            },
+            date: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Match date and time'
+            },
+            venue: {
+              type: 'string',
+              description: 'Match venue/stadium'
+            },
+            score: {
+              type: 'string',
+              description: 'Match score (e.g., "2-1")'
+            },
+            status: {
+              type: 'string',
+              enum: ['scheduled', 'live', 'completed', 'cancelled'],
+              default: 'scheduled',
+              description: 'Match status'
+            }
+          }
+        },
+        Tournament: {
+          type: 'object',
+          required: ['name'],
+          properties: {
+            _id: {
+              type: 'string',
+              description: 'Auto-generated MongoDB ID'
+            },
+            name: {
+              type: 'string',
+              description: 'Tournament name'
+            },
+            teams: {
+              type: 'array',
+              items: {
+                type: 'string'
+              },
+              description: 'Array of team IDs'
+            },
+            matches: {
+              type: 'array',
+              items: {
+                type: 'string'
+              },
+              description: 'Array of match IDs'
+            },
+            bracket: {
+              type: 'object',
+              description: 'Tournament bracket structure'
+            }
+          }
+        },
+        Error: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              description: 'Error message'
+            },
+            error: {
+              type: 'string',
+              description: 'Detailed error description'
+            }
+          }
+        }
+      }
+    }
+  },
+  apis: ['./routes/*.js'],
+};
 
-// Basic route
-app.get('/', (req, res) => {
-  res.send('Football Management API is running!');
-});
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Routes
-// Matches routes
-const matchesRouter = require('./routes/matches');
-app.use('/api/matches', matchesRouter);
+app.use('/api/matches', require('./routes/matches'));
+app.use('/api/tournaments', require('./routes/tournaments'));
 
-// Teammate's tournament routes
-const tournamentsRouter = require('./routes/tournaments');
-app.use('/api/tournaments', tournamentsRouter);
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
+// Home route
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Football Management API', 
+    documentation: '/api-docs',
+    endpoints: {
+      matches: '/api/matches',
+      tournaments: '/api/tournaments'
+    }
+  });
+});
+
+// Health check route
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  res.status(500).json({ 
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'production' ? {} : err.message 
+  });
 });
 
-// 404 handler
+// FIXED: 404 handler - use app.use() instead of app.use('*')
 app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+  res.status(404).json({ 
+    message: 'Route not found',
+    availableRoutes: {
+      home: '/',
+      documentation: '/api-docs',
+      health: '/health',
+      matches: '/api/matches',
+      tournaments: '/api/tournaments'
+    }
+  });
 });
+
+const PORT = process.env.PORT || 3000;
+
+// Start server
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`API Documentation: http://localhost:${PORT}/api-docs`);
+  });
+});
+
+module.exports = app;

@@ -9,7 +9,7 @@ const TournamentSchema = new mongoose.Schema(
     teams: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Team",
+        default: []
       },
     ],
     matches: [

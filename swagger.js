@@ -7,7 +7,7 @@ const doc = {
     description: 'API for managing football teams, players, matches, and tournaments',
     version: '1.0.0'
   },
-  host: "localhost:3000",
+  host: "localhost:3002",
   basePath: "/",
   schemes: ["http"],
   tags: [

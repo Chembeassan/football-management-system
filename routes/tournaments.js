@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const tournamentsController = require('../controllers/tournamentsController');
+const validateTournament = require('../validator/tournamentValidator');
+const auth = require("../tournamentsAuth/auth");
+
+// Dummy controllers for
 
 /**
  * @swagger
@@ -69,7 +73,7 @@ router.get('/:id', tournamentsController.getTournamentById);
  *       400:
  *         description: Invalid input
  */
-router.post('/', tournamentsController.createTournament);
+router.post('/', auth(['admin','coach']), validateTournament,  tournamentsController.createTournament);
 
 /**
  * @swagger
@@ -95,7 +99,12 @@ router.post('/', tournamentsController.createTournament);
  *       404:
  *         description: Tournament not found
  */
-router.put('/:id', tournamentsController.updateTournament);
+router.put(
+  "/:id",
+  auth(["admin", "coach"]),
+  validateTournament,
+  tournamentsController.updateTournament
+);
 
 /**
  * @swagger

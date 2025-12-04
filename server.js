@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3002;
 
 // Middleware
 app.use(express.json());
@@ -38,8 +39,13 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: process.env.RENDER_URL || 'http://localhost:3000',
-        description: process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server'
+        // Dynamic URL based on environment
+        url: process.env.NODE_ENV === 'production' 
+          ? 'https://football-management-system.onrender.com'
+          : `http://localhost:${PORT}`,
+        description: process.env.NODE_ENV === 'production' 
+          ? 'Production server' 
+          : 'Development server'
       }
     ],
     tags: [
@@ -185,7 +191,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// FIXED: 404 handler - use app.use() instead of app.use('*')
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ 
     message: 'Route not found',
@@ -198,8 +204,6 @@ app.use((req, res) => {
     }
   });
 });
-
-const PORT = process.env.PORT || 3000;
 
 // Start server
 connectDB().then(() => {

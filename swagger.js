@@ -18,6 +18,10 @@ const doc = {
     {
       name: 'Tournaments',
       description: 'Football tournaments management'
+    },
+    {
+      name: 'Teams',
+      description: 'Football teams management'
     }
   ],
   definitions: {
@@ -37,6 +41,13 @@ const doc = {
       matches: ["string"],
       bracket: {}
     },
+    Team: {
+      _id: "string",
+      name: "string",
+      coach: "string",
+      stadium: "string",
+      points: 0
+},
     Error: {
       message: "string",
       error: "string"

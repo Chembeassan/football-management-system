@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const TournamentSchema = new mongoose.Schema(
+ const TournamentSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -9,7 +9,7 @@ const TournamentSchema = new mongoose.Schema(
     teams: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        default: []
+        ref: "Team",
       },
     ],
     matches: [
@@ -27,3 +27,7 @@ const TournamentSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Tournament", TournamentSchema);
+ 
+
+
+

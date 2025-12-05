@@ -7,7 +7,7 @@ const doc = {
     description: 'API for managing football teams, players, matches, and tournaments',
     version: '1.0.0'
   },
-  host: "localhost:3002",
+  host: "localhost:3001",
   basePath: "/",
   schemes: ["http"],
   tags: [
@@ -56,6 +56,6 @@ const doc = {
 };
 
 const outputFile = './swagger-output.json';
-const endpointsFiles = ['./routes/matches.js', './routes/tournaments.js'];
+const endpointsFiles = ['./routes/matches.js', './routes/tournaments.js', './routes/teams.js'];
 
 swaggerAutogen(outputFile, endpointsFiles, doc);

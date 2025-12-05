@@ -50,7 +50,8 @@ const swaggerOptions = {
     tags: [
       { name: 'Matches', description: 'Football matches management' },
       { name: 'Tournaments', description: 'Football tournaments management' },
-      { name: 'Teams', description: 'Football teams management' }
+      { name: 'Teams', description: 'Football teams management' },
+      { name: 'Players', description: 'Football players management' }
     ],
     components: {
       schemas: {
@@ -90,6 +91,26 @@ const swaggerOptions = {
             points: { type: 'number', default: 0, description: 'Team points' }
           }
         },
+        Player: {
+          type: 'object',
+          required: ['name', 'position', 'teamId', 'jerseyNumber'],
+          properties: {
+            _id: { type: 'string', description: 'Auto-generated MongoDB ID' },
+            name: { type: 'string', description: 'Player name' },
+            position: { type: 'string', description: 'Player position' },
+            teamId: { type: 'string', description: 'Team ID' },
+            jerseyNumber: { type: 'number', description: 'Jersey number' },
+            stats: {
+              type: 'object',
+              properties: {
+                goals: { type: 'number', default: 0, description: 'Number of goals scored' },
+                assists: { type: 'number', default: 0, description: 'Number of assists' },
+                matchesPlayed: { type: 'number', default: 0, description: 'Number of matches played' }
+              }
+            },
+            status: { type: 'boolean', default: true, description: 'Player status: true = active, false = inactive' }
+          }
+        },
         Error: {
           type: 'object',
           properties: {
@@ -109,6 +130,7 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api/matches', require('./routes/matches'));
 app.use('/api/tournaments', require('./routes/tournaments'));
 app.use('/api/teams', require('./routes/teams')); // <-- Added Teams routes
+app.use('/api/players', require('./routes/players'));
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -121,7 +143,8 @@ app.get('/', (req, res) => {
     endpoints: {
       matches: '/api/matches',
       tournaments: '/api/tournaments',
-      teams: '/api/teams'
+      teams: '/api/teams',
+      players: '/api/players'
     }
   });
 });
@@ -154,7 +177,8 @@ app.use((req, res) => {
       health: '/health',
       matches: '/api/matches',
       tournaments: '/api/tournaments',
-      teams: '/api/teams'
+      teams: '/api/teams',
+      players: '/api/players'
     }
   });
 });

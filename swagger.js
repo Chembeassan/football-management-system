@@ -22,6 +22,10 @@ const doc = {
     {
       name: 'Teams',
       description: 'Football teams management'
+    },
+    {
+      name: 'Players',
+      description: 'Football players management'
     }
   ],
   definitions: {
@@ -47,7 +51,20 @@ const doc = {
       coach: "string",
       stadium: "string",
       points: 0
-},
+    },
+    Player: {
+      _id: "string",
+      name: "string",
+      position: "string",
+      teamId: "string",
+      jerseyNumber: 0,
+      stats: {
+        goals: 0,
+        assists: 0,
+        matchesPlayed: 0
+      },
+      status: true
+    },
     Error: {
       message: "string",
       error: "string"
@@ -56,6 +73,6 @@ const doc = {
 };
 
 const outputFile = './swagger-output.json';
-const endpointsFiles = ['./routes/matches.js', './routes/tournaments.js', './routes/teams.js'];
+const endpointsFiles = ['./routes/matches.js', './routes/tournaments.js', './routes/teams.js', './routes/players.js'];
 
 swaggerAutogen(outputFile, endpointsFiles, doc);

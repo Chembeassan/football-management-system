@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const playersController = require('../controllers/playersController');
-const { validatePlayer, validate } = require('../middleware/validation');
+const { validatePlayer, validateIdParam, validate } = require('../middleware/validation');
 
 /**
  * @swagger
@@ -51,7 +51,7 @@ router.get('/', playersController.getAllPlayers);
  *       404:
  *         description: Player not found
  */
-router.get('/:id', playersController.getPlayerById);
+router.get('/:id', validateIdParam, validate, playersController.getPlayerById);
 
 /**
  * @swagger
@@ -123,7 +123,7 @@ router.post('/', validatePlayer, validate, playersController.createPlayer);
  *       404:
  *         description: Player not found
  */
-router.put('/:id', validatePlayer, validate, playersController.updatePlayer);
+router.put('/:id', validatePlayer, validateIdParam, validate, playersController.updatePlayer);
 
 /**
  * @swagger

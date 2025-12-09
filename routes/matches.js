@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const matchesController = require('../controllers/matchesController');
+const { validateMatch, validateIdParam, validate} = require('../middleware/validation');
 
 /**
  * @swagger
@@ -50,7 +51,7 @@ router.get('/', matchesController.getAllMatches);
  *       404:
  *         description: Match not found
  */
-router.get('/:id', matchesController.getMatchById);
+router.get('/:id', validateIdParam, validate, matchesController.getMatchById);
 
 /**
  * @swagger
@@ -70,7 +71,7 @@ router.get('/:id', matchesController.getMatchById);
  *       400:
  *         description: Invalid input
  */
-router.post('/', matchesController.createMatch);
+router.post('/', validateMatch, validate, matchesController.createMatch);
 
 /**
  * @swagger
@@ -103,7 +104,7 @@ router.post('/', matchesController.createMatch);
  *       404:
  *         description: Match not found
  */
-router.put('/:id', matchesController.updateMatch);
+router.put('/:id', validateMatch, validateIdParam, validate, matchesController.updateMatch);
 
 /**
  * @swagger

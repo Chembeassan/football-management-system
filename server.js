@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(express.json());
 
-// MongoDB connection
+/* // MongoDB connection
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/football-management');
@@ -22,6 +22,35 @@ const connectDB = async () => {
     process.exit(1);
   }
 };
+ */
+
+// MongoDB connection function
+const connectDB = async () => {
+  try {
+    // Skip real connection when running tests
+    if (process.env.NODE_ENV === "test") {
+      console.log("Skipping MongoDB connection in test environment");
+      return;
+    }
+
+    await mongoose.connect(
+      process.env.MONGODB_URI || "mongodb://localhost:27017/football-management"
+    );
+
+    console.log("Connected to MongoDB");
+
+  } catch (error) {
+    console.error("MongoDB connection error:", error);
+
+    // Do NOT exit during tests
+    if (process.env.NODE_ENV !== "test") {
+      process.exit(1);
+    }
+  }
+};
+
+
+
 
 // Swagger configuration
 const swaggerOptions = {
@@ -135,6 +164,10 @@ app.use('/api/players', require('./routes/players'));
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+
+
+
+
 // Home route
 app.get('/', (req, res) => {
   res.json({
@@ -183,12 +216,43 @@ app.use((req, res) => {
   });
 });
 
-// Start server
+/* // Start server
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`API Documentation: http://localhost:${PORT}/api-docs`);
   });
-});
+}); */
+
+
+
+/* // Only connect/start server if run directly (not in tests)
+if (require.main === module) {
+  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/football-management')
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`API Documentation: http://localhost:${PORT}/api-docs`);
+    });
+  })
+  .catch((error) => {
+    console.error("MongoDB connection error:", error);
+    process.exit(1);
+  });
+} */
+
+
+
+  // Start server only when not testing
+if (require.main === module) {
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`API Documentation: http://localhost:${PORT}/api-docs`);
+    });
+  });
+}
+
 
 module.exports = app;

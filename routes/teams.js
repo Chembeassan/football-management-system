@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const teamsController = require("../controllers/teamsController");
+const {
+  validateTeam,
+  validateIdParam,
+  validate,
+} = require("../middleware/validation");
 
 /**
  * @swagger
@@ -20,26 +25,6 @@ const teamsController = require("../controllers/teamsController");
  *         description: List of all teams
  */
 router.get("/", teamsController.getAllTeams);
-
-/**
- * @swagger
- * /api/teams/{id}:
- *   get:
- *     summary: Get a team by ID
- *     tags: [Teams]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Team data
- *       404:
- *         description: Team not found
- */
-router.get("/:id", teamsController.getTeamById);
 
 /**
  * @swagger
@@ -80,7 +65,33 @@ router.get("/standings", teamsController.getTeamStandings);
  *       400:
  *         description: Invalid input
  */
-router.post("/", teamsController.createTeam);
+
+
+
+
+
+/**
+ * @swagger
+ * /api/teams/{id}:
+ *   get:
+ *     summary: Get a team by ID
+ *     tags: [Teams]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Team data
+ *       404:
+ *         description: Team not found
+ */
+router.get("/:id", validateIdParam, validate, teamsController.getTeamById);
+
+
+router.post("/",   validateTeam, validate,   teamsController.createTeam);
 
 /**
  * @swagger
@@ -106,7 +117,13 @@ router.post("/", teamsController.createTeam);
  *       404:
  *         description: Team not found
  */
-router.put("/:id", teamsController.updateTeam);
+router.put(
+  "/:id",
+  validateIdParam,
+  validateTeam,
+  validate,
+  teamsController.updateTeam
+);
 
 /**
  * @swagger

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const tournamentsController = require('../controllers/tournamentsController');
+const { validateTournament, validateIdParam,  validate } = require('../middleware/validation');
 
 /**
  * @swagger
@@ -25,7 +26,7 @@ const tournamentsController = require('../controllers/tournamentsController');
  *               items:
  *                 $ref: '#/components/schemas/Tournament'
  */
-router.get('/', tournamentsController.getTournaments);
+router.get('/',   tournamentsController.getTournaments);
 
 /**
  * @swagger
@@ -49,7 +50,7 @@ router.get('/', tournamentsController.getTournaments);
  *       404:
  *         description: Tournament not found
  */
-router.get('/:id', tournamentsController.getTournamentById);
+router.get("/:id", validateIdParam, validate, tournamentsController.getTournamentById);
 
 /**
  * @swagger
@@ -69,7 +70,7 @@ router.get('/:id', tournamentsController.getTournamentById);
  *       400:
  *         description: Invalid input
  */
-router.post('/', tournamentsController.createTournament);
+router.post('/', validateTournament, validate, tournamentsController.createTournament);
 
 /**
  * @swagger
@@ -95,7 +96,13 @@ router.post('/', tournamentsController.createTournament);
  *       404:
  *         description: Tournament not found
  */
-router.put('/:id', tournamentsController.updateTournament);
+router.put(
+    "/:id",
+    validateIdParam,
+  validateTournament,
+  validate,
+  tournamentsController.updateTournament
+);
 
 /**
  * @swagger

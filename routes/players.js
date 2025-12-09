@@ -115,17 +115,8 @@ router.post('/', validatePlayer, validate, playersController.createPlayer);
  *       required: true
  *       content:
  *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               position:
- *                 type: string
- *               jerseyNumber:
- *                 type: number
- *               status:
- *                 type: boolean
+ *           schema: 
+ *             $ref: '#/components/schemas/Player'
  *     responses:
  *       200:
  *         description: Player updated successfully

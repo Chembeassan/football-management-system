@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 
 // Validation rules for matches
 const validateMatch = [
@@ -45,6 +45,75 @@ const validatePlayer = [
     .isBoolean().withMessage('Status must be true (active) or false (inactive)')
 ];
 
+// Validation rules for tournaments
+const validateTournament = [
+  body('name')
+    .notEmpty()
+    .withMessage('Tournament name is required'),
+
+  body('teams')
+    .optional()
+    .isArray()
+    .withMessage('Teams must be an array of IDs'),
+
+  body('teams.*')
+    .optional()
+    .isMongoId()
+    .withMessage('Each team must be a valid Mongo ID'),
+
+  body('matches')
+    .optional()
+    .isArray()
+    .withMessage('Matches must be an array of IDs'),
+
+  body('matches.*')
+    .optional()
+    .isMongoId()
+    .withMessage('Each match must be a valid Mongo ID'),
+
+  body('bracket')
+    .optional()
+    .isObject()
+    .withMessage('Bracket must be an object'),
+];
+
+// Validation rules for teams
+const validateTeam = [
+  body("name")
+    .notEmpty()
+    .withMessage("Team name is required")
+    .isString()
+    .withMessage("Team name must be a string"),
+
+  body("coach")
+    .notEmpty()
+    .withMessage("Coach name is required")
+    .isString()
+    .withMessage("Coach name must be a string"),
+
+  body("stadium")
+    .notEmpty()
+    .withMessage("Stadium is required")
+    .isString()
+    .withMessage("Stadium must be a string"),
+
+  body("points")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Points must be a non-negative integer"),
+];
+
+
+
+
+// Validation rule for :id params
+const validateIdParam = [
+  param('id')
+    .isMongoId()
+    .withMessage('Invalid ID format'),
+];
+
+
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -56,5 +125,8 @@ const validate = (req, res, next) => {
 module.exports = {
   validateMatch,
   validatePlayer,
+  validateTournament,
+  validateTeam,
+  validateIdParam,
   validate,
 };

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const playersController = require('../controllers/playersController');
 const { validatePlayer, validateIdParam, validate } = require('../middleware/validation');
+const { isAuthenticated } = require("../middleware/authenticate");
 
 /**
  * @swagger
@@ -84,6 +85,8 @@ router.get('/team/:teamId', playersController.getPlayersByTeam);
  *   post:
  *     summary: Create a new player
  *     tags: [Players]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     requestBody:
  *       required: true
  *       content:
@@ -96,7 +99,7 @@ router.get('/team/:teamId', playersController.getPlayersByTeam);
  *       400:
  *         description: Invalid input
  */
-router.post('/', validatePlayer, validate, playersController.createPlayer);
+router.post('/', isAuthenticated, validatePlayer, validate, playersController.createPlayer);
 
 /**
  * @swagger
@@ -104,6 +107,8 @@ router.post('/', validatePlayer, validate, playersController.createPlayer);
  *   put:
  *     summary: Update a player
  *     tags: [Players]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     parameters:
  *       - in: path
  *         name: id
@@ -123,7 +128,7 @@ router.post('/', validatePlayer, validate, playersController.createPlayer);
  *       404:
  *         description: Player not found
  */
-router.put('/:id', validatePlayer, validateIdParam, validate, playersController.updatePlayer);
+router.put('/:id', isAuthenticated, validatePlayer, validateIdParam, validate, playersController.updatePlayer);
 
 /**
  * @swagger
@@ -131,6 +136,8 @@ router.put('/:id', validatePlayer, validateIdParam, validate, playersController.
  *   delete:
  *     summary: Delete a player
  *     tags: [Players]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     parameters:
  *       - in: path
  *         name: id
@@ -143,6 +150,6 @@ router.put('/:id', validatePlayer, validateIdParam, validate, playersController.
  *       404:
  *         description: Player not found
  */
-router.delete('/:id', playersController.deletePlayer);
+router.delete('/:id', isAuthenticated, playersController.deletePlayer);
 
 module.exports = router;

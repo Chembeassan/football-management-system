@@ -65,6 +65,23 @@ const doc = {
       },
       status: true
     },
+    securityDefinitions: {
+      googleOAuth: {
+        type: "oauth2",
+        flow: "accessCode",
+        authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth",
+        tokenUrl: "https://oauth2.googleapis.com/token",
+        scopes: {
+          profile: "Access your profile information",
+          email: "Access your email address"
+        }
+      }
+    },
+    security: [
+      {
+        googleOAuth: ["profile", "email"]
+      }
+    ],  
     Error: {
       message: "string",
       error: "string"

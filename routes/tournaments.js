@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const tournamentsController = require('../controllers/tournamentsController');
 const { validateTournament, validateIdParam,  validate } = require('../middleware/validation');
+const { isAuthenticated } = require("../middleware/authenticate");
 
 /**
  * @swagger
@@ -58,6 +59,8 @@ router.get("/:id", validateIdParam, validate, tournamentsController.getTournamen
  *   post:
  *     summary: Create a new tournament
  *     tags: [Tournaments]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     requestBody:
  *       required: true
  *       content:
@@ -70,7 +73,7 @@ router.get("/:id", validateIdParam, validate, tournamentsController.getTournamen
  *       400:
  *         description: Invalid input
  */
-router.post('/', validateTournament, validate, tournamentsController.createTournament);
+router.post('/', isAuthenticated, validateTournament, validate, tournamentsController.createTournament);
 
 /**
  * @swagger
@@ -78,6 +81,8 @@ router.post('/', validateTournament, validate, tournamentsController.createTourn
  *   put:
  *     summary: Update a tournament
  *     tags: [Tournaments]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     parameters:
  *       - in: path
  *         name: id
@@ -98,6 +103,7 @@ router.post('/', validateTournament, validate, tournamentsController.createTourn
  */
 router.put(
     "/:id",
+    isAuthenticated,
     validateIdParam,
   validateTournament,
   validate,
@@ -110,6 +116,8 @@ router.put(
  *   delete:
  *     summary: Delete a tournament
  *     tags: [Tournaments]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     parameters:
  *       - in: path
  *         name: id
@@ -122,6 +130,6 @@ router.put(
  *       404:
  *         description: Tournament not found
  */
-router.delete('/:id', tournamentsController.deleteTournament);
+router.delete('/:id', isAuthenticated, tournamentsController.deleteTournament);
 
 module.exports = router;

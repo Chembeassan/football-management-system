@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const matchesController = require('../controllers/matchesController');
 const { validateMatch, validateIdParam, validate} = require('../middleware/validation');
+const { isAuthenticated } = require("../middleware/authenticate");
 
 /**
  * @swagger
@@ -59,6 +60,8 @@ router.get('/:id', validateIdParam, validate, matchesController.getMatchById);
  *   post:
  *     summary: Create a new match
  *     tags: [Matches]
+ *     security:
+ *      - googleOAuth: [profile, email]
  *     requestBody:
  *       required: true
  *       content:
@@ -71,7 +74,7 @@ router.get('/:id', validateIdParam, validate, matchesController.getMatchById);
  *       400:
  *         description: Invalid input
  */
-router.post('/', validateMatch, validate, matchesController.createMatch);
+router.post('/', isAuthenticated, validateMatch, validate, matchesController.createMatch);
 
 /**
  * @swagger
@@ -79,6 +82,8 @@ router.post('/', validateMatch, validate, matchesController.createMatch);
  *   put:
  *     summary: Update a match
  *     tags: [Matches]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     parameters:
  *       - in: path
  *         name: id
@@ -104,7 +109,7 @@ router.post('/', validateMatch, validate, matchesController.createMatch);
  *       404:
  *         description: Match not found
  */
-router.put('/:id', validateMatch, validateIdParam, validate, matchesController.updateMatch);
+router.put('/:id', isAuthenticated, validateMatch, validateIdParam, validate, matchesController.updateMatch);
 
 /**
  * @swagger
@@ -112,6 +117,8 @@ router.put('/:id', validateMatch, validateIdParam, validate, matchesController.u
  *   delete:
  *     summary: Delete a match
  *     tags: [Matches]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     parameters:
  *       - in: path
  *         name: id
@@ -124,6 +131,6 @@ router.put('/:id', validateMatch, validateIdParam, validate, matchesController.u
  *       404:
  *         description: Match not found
  */
-router.delete('/:id', matchesController.deleteMatch);
+router.delete('/:id', isAuthenticated, matchesController.deleteMatch);
 
 module.exports = router;

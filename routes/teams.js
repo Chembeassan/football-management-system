@@ -6,6 +6,7 @@ const {
   validateIdParam,
   validate,
 } = require("../middleware/validation");
+const { isAuthenticated } = require("../middleware/authenticate");
 
 /**
  * @swagger
@@ -44,6 +45,8 @@ router.get("/standings", teamsController.getTeamStandings);
  *   post:
  *     summary: Create a new team
  *     tags: [Teams]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     requestBody:
  *       required: true
  *       content:
@@ -65,9 +68,7 @@ router.get("/standings", teamsController.getTeamStandings);
  *       400:
  *         description: Invalid input
  */
-
-
-
+router.post("/", isAuthenticated, validateTeam, validate,   teamsController.createTeam);
 
 
 /**
@@ -91,14 +92,14 @@ router.get("/standings", teamsController.getTeamStandings);
 router.get("/:id", validateIdParam, validate, teamsController.getTeamById);
 
 
-router.post("/",   validateTeam, validate,   teamsController.createTeam);
-
 /**
  * @swagger
  * /api/teams/{id}:
  *   put:
  *     summary: Update a team
  *     tags: [Teams]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     parameters:
  *       - in: path
  *         name: id
@@ -119,6 +120,7 @@ router.post("/",   validateTeam, validate,   teamsController.createTeam);
  */
 router.put(
   "/:id",
+  isAuthenticated,
   validateIdParam,
   validateTeam,
   validate,
@@ -131,6 +133,8 @@ router.put(
  *   delete:
  *     summary: Delete a team
  *     tags: [Teams]
+ *     security:
+ *       - googleOAuth: [profile, email]
  *     parameters:
  *       - in: path
  *         name: id
@@ -143,6 +147,6 @@ router.put(
  *       404:
  *         description: Team not found
  */
-router.delete("/:id", teamsController.deleteTeam);
+router.delete("/:id", isAuthenticated, teamsController.deleteTeam);
 
 module.exports = router;

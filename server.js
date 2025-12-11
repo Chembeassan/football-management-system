@@ -50,15 +50,34 @@ app
     .use("/", route);
 
     passport.use(new GoogleStrategy({
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,  
-        callbackURL: process.env.CALLBACK_URL
-        },
-      function(accessToken, refreshToken, profile, done) {
-        // In a real application, you would save the user info to your database here
-        return done(null, profile);
-      }
-    ));
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.CALLBACK_URL
+  },
+  (accessToken, refreshToken, profile, done) => {
+    return done(null, profile);
+  }
+));
+
+// REQUIRED LOGIN ROUTE
+app.get("/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"]
+  })
+);
+
+// CALLBACK ROUTE
+app.get("/auth/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/api-docs",
+    session: false
+  }),
+  (req, res) => {
+    req.session.user = req.user;
+    res.redirect("/");
+  }
+);
+
 
 passport.serializeUser((user, done) => {
     done(null, user);

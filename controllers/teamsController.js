@@ -1,4 +1,7 @@
 const Team = require("../models/Team");
+const mongoose = require("mongoose");
+
+
 
 // Get all teams
 exports.getAllTeams = async (req, res) => {
@@ -12,14 +15,20 @@ exports.getAllTeams = async (req, res) => {
 
 // Get a team by ID
 exports.getTeamById = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
+
   try {
-    const team = await Team.findById(req.params.id);
+    const team = await Team.findById(id);
     if (!team) return res.status(404).json({ message: "Team not found" });
     res.status(200).json(team);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // Create a new team
 exports.createTeam = async (req, res) => {

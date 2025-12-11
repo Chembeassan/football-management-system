@@ -1,12 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const teamsController = require("../controllers/teamsController");
+
+
+
 const {
   validateTeam,
   validateIdParam,
   validate,
 } = require("../middleware/validation");
 const { isAuthenticated } = require("../middleware/authenticate");
+
+
+
 
 /**
  * @swagger
@@ -89,7 +95,7 @@ router.post("/", isAuthenticated, validateTeam, validate,   teamsController.crea
  *       404:
  *         description: Team not found
  */
-router.get("/:id", validateIdParam, validate, teamsController.getTeamById);
+router.get("/:id",  teamsController.getTeamById);
 
 
 /**
